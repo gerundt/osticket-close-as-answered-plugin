@@ -21,8 +21,8 @@ class CloseAsAnsweredPlugin extends Plugin {
 			try {
 				if (!$ticket->isAnswered()) {
 					$ticket->markAnswered();
-					$ost->logInfo('Mark ticket as answered with CloseAsAnsweredPlugin',
-						sprintf('Mark ticket %s as answered', $ticket->getNumber()));
+					$ticket->logActivity(sprintf(__('Ticket Marked %s'), 'Answered'), 
+						sprintf(__('Ticket flagged as %s by %s'), 'Answered', 'CloseAsAnsweredPlugin'));
 				}
 			} catch(Exception $e) {
 				$ost->logError('CloseAsAnsweredPlugin Exception', $e->getMessage());
