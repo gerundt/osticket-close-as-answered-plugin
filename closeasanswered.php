@@ -5,9 +5,13 @@ require_once(INCLUDE_DIR.'class.plugin.php');
 
 class CloseAsAnsweredPlugin extends Plugin {
 
+	var $log_activity = true;
+
 	var $config_class = 'CloseAsAnsweredConfig';
 
 	function bootstrap() {
+		$this->log_activity = $this->getConfig()->get('log_activity', true);
+		
 		Signal::connect('object.edited', array($this, 'onObjectEdited'), 'Ticket');
 	}
 
@@ -27,8 +31,10 @@ class CloseAsAnsweredPlugin extends Plugin {
 			try {
 				if ($ticket->isClosed() && !$ticket->isAnswered()) {
 					$ticket->markAnswered();
-					$ticket->logActivity(sprintf(__('Ticket Marked %s'), 'Answered'), 
-						sprintf(__('Ticket flagged as %s by %s'), 'Answered', 'CloseAsAnsweredPlugin'));
+					if ($this->log_activity) {
+						$ticket->logActivity(sprintf(__('Ticket Marked %s'), 'Answered'), 
+							sprintf(__('Ticket flagged as %s by %s'), 'Answered', 'CloseAsAnsweredPlugin'));
+					}
 				}
 			} catch(Exception $e) {
 				$ost->logError('CloseAsAnsweredPlugin Exception', $e->getMessage());
@@ -40,16 +46,24 @@ class CloseAsAnsweredPlugin extends Plugin {
 
 class CloseAsAnsweredConfig extends PluginConfig {
 
-    function getOptions() {
-        return array(
-            'dummy' => new BooleanField(array(
-                'label' => __('Dummy option'),
-                'default' => true,
-                'configuration' => array(
-                    'desc' => __('Unfortunately we need options to install a plugin. So here is a dummy option! ;-)')
-                )
-            )),
-        );
-    }
+	function getOptions() {
+		return array(
+			'log_activity' => new BooleanField(array(
+				'label' => __('Log Activity'),
+				'default' => true,
+				'configuration' => array(
+					'desc' => __('Add a message to the activity log')
+				)
+			)),
+		);
+	}
+
+	function pre_save(&$config, &$errors) {
+		global $msg;
+		
+		if (!$errors)
+			$msg = __('Configuration updated successfully');
+		return true;
+	}
 
 }
