@@ -5,8 +5,14 @@ require_once(INCLUDE_DIR.'class.plugin.php');
 
 class CloseAsAnsweredPlugin extends Plugin {
 
+	var $config_class = 'CloseAsAnsweredConfig';
+
 	function bootstrap() {
 		Signal::connect('object.edited', array($this, 'onObjectEdited'), 'Ticket');
+	}
+
+	function isMultiInstance() {
+		return false;
 	}
 
 	/**
@@ -29,5 +35,21 @@ class CloseAsAnsweredPlugin extends Plugin {
 			}
 		}
 	}
+
+}
+
+class CloseAsAnsweredConfig extends PluginConfig {
+
+    function getOptions() {
+        return array(
+            'dummy' => new BooleanField(array(
+                'label' => __('Dummy option'),
+                'default' => true,
+                'configuration' => array(
+                    'desc' => __('Unfortunately we need options to install a plugin. So here is a dummy option! ;-)')
+                )
+            )),
+        );
+    }
 
 }
