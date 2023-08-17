@@ -23,9 +23,9 @@ class CloseAsAnsweredPlugin extends Plugin {
 	function onObjectEdited($ticket, $data) {
 		global $ost;
 		
-		if (isset($data['type']) && $data['type'] == 'closed') {
+		if (isset($data['key']) && $data['key'] == 'status_id') {
 			try {
-				if (!$ticket->isAnswered()) {
+				if ($ticket->isClosed() && !$ticket->isAnswered()) {
 					$ticket->markAnswered();
 					$ticket->logActivity(sprintf(__('Ticket Marked %s'), 'Answered'), 
 						sprintf(__('Ticket flagged as %s by %s'), 'Answered', 'CloseAsAnsweredPlugin'));
